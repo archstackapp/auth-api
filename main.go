@@ -3,6 +3,7 @@ package main
 import (
 	"gitlab.com/archstack/auth-api/configs"
 	"gitlab.com/archstack/auth-api/internal/server/oauth2"
+	"gitlab.com/archstack/auth-api/internal/services/users"
 	"gitlab.com/archstack/workspace-api/lib/datastore"
 )
 
@@ -19,10 +20,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	defer datastore.DB.Close()
 
-	oauth2, err := oauth2.NewService(oauth2Config)
+	users, err := users.NewService(datastore)
+
+	oauth2, err := oauth2.NewService(oauth2Config, users)
 	if err != nil {
 		panic(err)
 	}

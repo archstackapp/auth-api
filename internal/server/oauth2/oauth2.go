@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/generates"
 	"github.com/go-oauth2/oauth2/v4/manage"
@@ -42,12 +41,15 @@ func NewService(config *Config, users *users.Users) (*OAuth2, error) {
 
 	srv := server.NewServer(server.NewConfig(), manager)
 
-	srv.SetPasswordAuthorizationHandler(func(username, password string) (userID string, err error) {
-		if username == "test" && password == "test" {
-			userID = "test"
-		}
-		return
-	})
+	oauth2 := &OAuth2{
+		config,
+		manager,
+		clientStore,
+		srv,
+		users,
+	}
+
+	srv.SetPasswordAuthorizationHandler(oauth2.passwordAuthorizationHandler)
 
 	srv.SetUserAuthorizationHandler(userAuthorizeHandler)
 
@@ -59,14 +61,6 @@ func NewService(config *Config, users *users.Users) (*OAuth2, error) {
 	srv.SetResponseErrorHandler(func(re *errors.Response) {
 		log.Println("Response Error:", re.Error.Error())
 	})
-
-	oauth2 := &OAuth2{
-		config,
-		manager,
-		clientStore,
-		srv,
-		users,
-	}
 
 	return oauth2, nil
 }

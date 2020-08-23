@@ -7,6 +7,20 @@ import (
 	"github.com/go-session/session"
 )
 
+func (o *OAuth2) passwordAuthorizationHandler(mail string, password string) (string, error) {
+	user, err := o.users.Repository.GetByMail(mail)
+	if err != nil {
+		return "", err
+	}
+
+	err = o.verifyUser(user, password)
+	if err != nil {
+		return "", err
+	}
+
+	return user.ID.String(), err
+}
+
 func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string, err error) {
 	store, err := session.Start(r.Context(), w, r)
 	if err != nil {

@@ -4,6 +4,8 @@ import (
 	"errors"
 
 	"golang.org/x/crypto/bcrypt"
+
+	"gitlab.com/archstack/workspace-api/lib/models"
 )
 
 var errWrongPassword = errors.New("Password is wrong")
@@ -13,15 +15,10 @@ func checkPasswordHash(password string, hash string) bool {
 	return err == nil
 }
 
-func (o *OAuth2) verifyUser(mail string, password string) (string, error) {
-	user, err := o.users.Repository.GetByMail(mail)
-	if err != nil {
-		return "", err
-	}
-
+func (o *OAuth2) verifyUser(user *models.User, password string) error {
 	if !checkPasswordHash(password, user.Password) {
-		return "", errWrongPassword
+		return errWrongPassword
 	}
 
-	return user.ID.String(), nil
+	return nil
 }
