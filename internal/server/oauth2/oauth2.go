@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/generates"
 	"github.com/go-oauth2/oauth2/v4/manage"
@@ -51,7 +52,7 @@ func NewService(config *Config, users *users.Users) (*OAuth2, error) {
 
 	srv.SetPasswordAuthorizationHandler(oauth2.passwordAuthorizationHandler)
 
-	srv.SetUserAuthorizationHandler(userAuthorizeHandler)
+	srv.SetUserAuthorizationHandler(oauth2.userAuthorizeHandler)
 
 	srv.SetInternalErrorHandler(func(err error) (re *errors.Response) {
 		log.Println("Internal Error:", err.Error())
