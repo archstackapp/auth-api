@@ -3,7 +3,7 @@ package configs
 import (
 	"time"
 
-	"gitlab.com/archstack/auth-api/internal/server/oauth2"
+	"gitlab.com/archstack/auth-api/internal/services/auth/keycloak"
 	"gitlab.com/archstack/workspace-api/lib/datastore"
 	"gitlab.com/archstack/workspace-api/lib/server/http"
 )
@@ -19,11 +19,11 @@ func (cfg *Configs) HTTP() (*http.Config, error) {
 	}, nil
 }
 
-// OAuth2 returns the configuration required for HTTP package
-func (cfg *Configs) OAuth2() (*oauth2.Config, error) {
-	return &oauth2.Config{
-		Port:            "8081",
-		ClientDomainURL: "http://localhost:9094",
+// Keycloak returns the configuration required for the keycloak auth impl.
+func (cfg *Configs) Keycloak() (*keycloak.Config, error) {
+	return &keycloak.Config{
+		Host: "http://localhost"
+		Port:            "8080",
 	}, nil
 }
 
