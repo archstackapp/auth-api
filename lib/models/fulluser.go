@@ -5,8 +5,8 @@ import (
 	"gitlab.com/archstack/workspace-api/lib/models"
 )
 
-// AuthenticatedUser represents an authenticated user of the apps
-type AuthenticatedUser struct {
+// FullUser represents an authenticated user of the apps.
+type FullUser struct {
 	ID     uuid.UUID `json:"id"`
 	AuthID uuid.UUID `json:"-"`
 

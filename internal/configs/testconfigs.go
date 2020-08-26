@@ -8,27 +8,27 @@ import (
 	"gitlab.com/archstack/workspace-api/lib/server/http"
 )
 
-// Configs struct handles all dependencies required for handling configurations
-type Configs struct {
+// TestConfigs struct handles all dependencies required for handling configurations
+type TestConfigs struct {
 }
 
 // HTTP returns the configuration required for HTTP package
-func (cfg *Configs) HTTP() (*http.Config, error) {
+func (cfg *TestConfigs) HTTP() (*http.Config, error) {
 	return &http.Config{
 		Port: "8080",
 	}, nil
 }
 
 // Keycloak returns the configuration required for the keycloak auth impl.
-func (cfg *Configs) Keycloak() (*keycloak.Config, error) {
+func (cfg *TestConfigs) Keycloak() (*keycloak.Config, error) {
 	return &keycloak.Config{
-		Host: "http://localhost"
-		Port:            "8080",
+		Host: "http://localhost",
+		Port: "8080",
 	}, nil
 }
 
 // Datastore returns datastore configuration
-func (cfg *Configs) Datastore() (*datastore.Config, error) {
+func (cfg *TestConfigs) Datastore() (*datastore.Config, error) {
 	return &datastore.Config{
 		Host:   "localhost",
 		Port:   "5432",
@@ -48,7 +48,7 @@ func (cfg *Configs) Datastore() (*datastore.Config, error) {
 	}, nil
 }
 
-// NewService returns an instance of Config with all the required dependencies initialized
-func NewService() (*Configs, error) {
-	return &Configs{}, nil
+// NewTestService returns an instance of Config with all the required dependencies initialized
+func NewTestService() (*TestConfigs, error) {
+	return &TestConfigs{}, nil
 }

@@ -11,6 +11,21 @@ type UserRepository struct {
 	datastore *datastore.Datastore
 }
 
+func (r *UserRepository) create(user *models.User) (*models.User, error) {
+	_, err := r.datastore.DB.Model(user).Insert()
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *UserRepository) remove(user *models.User) error {
+	_, err := r.datastore.DB.Model(user).Delete()
+
+	return err
+}
+
 func (r *UserRepository) GetByID(id uuid.UUID) (*models.User, error) {
 	user := new(models.User)
 

@@ -5,12 +5,21 @@ import "github.com/gofrs/uuid"
 // Auth struct holds all the dependencies required for the auth package. And exposes all services
 // provided by this package as its methods.
 type Auth interface {
+	CreateUser(*User) (*User, error)
+	DeleteUser(*User) error
+	GetUserByMail(string) (*User, error)
+	GetUserByID(uuid.UUID) (*User, error)
+	CheckToken(token string)
+}
+
+type Config struct {
+	JWTSigningKey string
 }
 
 // User represents the data that is necessary to authenticate a user with the apps.
-type User interface {
-	ID() uuid.UUID
-	FirstName() string
-	LastName() string
-	Mail() string
+type User struct {
+	ID        uuid.UUID `json:"-"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
+	Mail      string    `json:"mail"`
 }

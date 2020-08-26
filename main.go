@@ -1,10 +1,11 @@
 package main
 
 import (
-	"gitlab.com/archstack/auth-api/configs"
-	"gitlab.com/archstack/auth-api/internal/server/oauth2"
+	"gitlab.com/archstack/auth-api/internal/configs"
+	"gitlab.com/archstack/auth-api/internal/services/auth/keycloak"
 	"gitlab.com/archstack/auth-api/internal/services/users"
 	"gitlab.com/archstack/workspace-api/lib/datastore"
+	"gitlab.com/archstack/workspace-api/lib/logger"
 )
 
 func main() {
@@ -13,7 +14,9 @@ func main() {
 		panic(err)
 	}
 
-	oauth2Config, err := configs.OAuth2()
+	logger := logger.NewService()
+
+	keycloakConfig, err := configs.Keycloak()
 	pgConfig, err := configs.Datastore()
 
 	datastore, err := datastore.NewService(pgConfig)
@@ -22,12 +25,13 @@ func main() {
 	}
 	defer datastore.DB.Close()
 
-	users, err := users.NewService(datastore)
-
-	oauth2, err := oauth2.NewService(oauth2Config, users)
+	keycloak, err := keycloak.NewService(datastore, keycloakConfig)
 	if err != nil {
 		panic(err)
 	}
 
-	oauth2.Start()
+	_, err := users.NewService(logger, datastore, keycloak)
+	if err != nil {
+		panic(err)
+	}
 }
