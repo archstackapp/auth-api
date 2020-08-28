@@ -12,7 +12,14 @@ type UserRepository struct {
 }
 
 func (r *UserRepository) create(user *models.User) (*models.User, error) {
-	_, err := r.datastore.DB.Model(user).Insert()
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
+	user.ID = id
+
+	_, err = r.datastore.DB.Model(user).Insert()
 	if err != nil {
 		return nil, err
 	}

@@ -9,11 +9,14 @@ type Auth interface {
 	DeleteUser(*User) error
 	GetUserByMail(string) (*User, error)
 	GetUserByID(uuid.UUID) (*User, error)
-	CheckToken(token string)
+	CheckToken(token string) error
+	Login(string, string) (string, error)
+	PublicKey() interface{}
 }
 
 type Config struct {
 	JWTSigningKey string
+	Kid           string
 }
 
 // User represents the data that is necessary to authenticate a user with the apps.
@@ -22,4 +25,5 @@ type User struct {
 	FirstName string    `json:"firstName"`
 	LastName  string    `json:"lastName"`
 	Mail      string    `json:"mail"`
+	Password  string    `json:"password"`
 }

@@ -2,6 +2,7 @@ package keycloak
 
 import (
 	"context"
+	"crypto/rsa"
 	"errors"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/Nerzal/gocloak/v7"
 	"gitlab.com/archstack/auth-api/internal/services/auth"
 	"gitlab.com/archstack/workspace-api/lib/datastore"
+	"gitlab.com/archstack/workspace-api/lib/logger"
 )
 
 // Keycloak implements the Auth interface.
@@ -19,6 +21,9 @@ type Keycloak struct {
 	config           *Config
 	token            *gocloak.JWT
 	tokenLastUpdated time.Time
+	logger           *logger.Logger
+	Certs            interface{}
+	publicKey        *rsa.PublicKey
 }
 
 // Config struct holds all the configurations for accessing a keycloak instance.
@@ -30,33 +35,54 @@ type Config struct {
 	ClientSecret string `json:"clientSecret,omitempty"`
 
 	RealmName string `json:"realmName,omitempty"`
+	Kid       string `json:"kid,omitempty"`
 
 	AdminUserName string `json:"adminUsername,omitempty"`
 	AdminPassword string `json:"adminPassword,omitempty"`
 }
 
 // NewService creates a new Keycloak service.
-func NewService(datastore *datastore.Datastore, config *Config) (*Keycloak, error) {
+func NewService(logger *logger.Logger, datastore *datastore.Datastore, config *Config) (*Keycloak, error) {
 	client := gocloak.NewClient(config.Host + ":" + config.Port)
 
-	initialToken, err := getToken(context.Background(), config, client)
+	ctx := context.Background()
+	initialToken, err := getToken(ctx, config, client)
+	if err != nil {
+		panic(err)
+	}
+
+	certResult, err := client.GetCerts(ctx, config.RealmName)
+	if err != nil {
+		panic(err)
+	}
+	if certResult.Keys == nil {
+		panic("there is no keys to decode the token")
+	}
+	key := findUsedKey(config.Kid, *certResult.Keys)
+	rsaPublicKey, err := decodePublicKey(key.E, key.N)
 	if err != nil {
 		panic(err)
 	}
 
 	w := &Keycloak{
+		logger:           logger,
 		datastore:        datastore,
 		client:           client,
 		config:           config,
 		token:            initialToken,
 		tokenLastUpdated: time.Now(),
+		publicKey:        rsaPublicKey,
 	}
 
 	return w, nil
 }
 
+func (k *Keycloak) PublicKey() interface{} {
+	return k.publicKey
+}
+
 func getToken(ctx context.Context, config *Config, client gocloak.GoCloak) (*gocloak.JWT, error) {
-	token, err := client.LoginAdmin(ctx, config.AdminUserName, config.AdminPassword, config.RealmName)
+	token, err := client.LoginAdmin(ctx, config.AdminUserName, config.AdminPassword, "master")
 
 	return token, err
 }
@@ -81,6 +107,8 @@ func (k *Keycloak) CreateUser(user *auth.User) (*auth.User, error) {
 	ctx := context.Background()
 	token, err := k.getToken(ctx)
 	if err != nil {
+		k.logger.Zap.Debugw("Failed to get token",
+			"err", err)
 		return nil, err
 	}
 
@@ -95,12 +123,34 @@ func (k *Keycloak) CreateUser(user *auth.User) (*auth.User, error) {
 	}
 
 	idString, err := k.client.CreateUser(ctx, token.AccessToken, k.config.RealmName, keycloakUser)
+	if err != nil {
+		k.logger.Zap.Debugw("Failed to create keycloak user",
+			"keycloakUser", keycloakUser,
+			"err", err)
+		return nil, err
+	}
 
 	id, err := uuid.FromString(idString)
 	if err != nil {
+		k.logger.Zap.Errorw("Unable to parse id from idString. Keycloak user must be reset.",
+			"idString", idString,
+			"keycloakUser", keycloakUser)
 		return nil, err
 	}
 	user.ID = id
+
+	err = k.client.SetPassword(ctx, token.AccessToken, idString, k.config.RealmName, user.Password, false)
+	if err != nil {
+		user.ID = id
+		err2 := k.DeleteUser(user)
+		if err2 != nil {
+			k.logger.Zap.Errorw("Unable to delete orphaned keycloak user",
+				"err", err2.Error(),
+				"userId", user.ID,
+				"userMail", user.Mail)
+		}
+		return nil, err
+	}
 
 	return user, nil
 }
@@ -143,7 +193,7 @@ func (k *Keycloak) GetUserByID(id uuid.UUID) (*auth.User, error) {
 }
 
 // DeleteUser deletes a user from the keycloak instance by its id.
-func (k *Keycloak) DeleteUser(id uuid.UUID) error {
+func (k *Keycloak) DeleteUserByID(id uuid.UUID) error {
 	ctx := context.Background()
 	token, err := k.getToken(ctx)
 	if err != nil {
@@ -156,6 +206,11 @@ func (k *Keycloak) DeleteUser(id uuid.UUID) error {
 	}
 
 	return nil
+}
+
+// DeleteUser deletes a user from the keycloak instance by its id.
+func (k *Keycloak) DeleteUser(user *auth.User) error {
+	return k.DeleteUserByID(user.ID)
 }
 
 func (k *Keycloak) Login(mail string, password string) (string, error) {
@@ -178,7 +233,9 @@ func (k *Keycloak) CheckToken(token string) error {
 	if err != nil {
 		return err
 	}
-	println("foudn tokenvalidation with header ", tokenValidation.Header)
+
+	//claims := (tokenValidation.Claims).(jwt.MapClaims)
+	//claims["name"] = "Jon Snow"
 
 	// rptResult, err := k.client.RetrospectToken(ctx, token, k.config.ClientID, k.config.ClientSecret, k.config.RealmName)
 	// if err != nil {

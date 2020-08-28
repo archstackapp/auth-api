@@ -30,16 +30,15 @@ func (cfg *Configs) Keycloak() (*keycloak.Config, error) {
 		RealmName:     "users",
 		AdminUserName: "admin",
 		AdminPassword: "admin",
+		Kid:           "QUOiE1p0V7YUUqxotLr3k_i8REyAHzAy5SMlSvFE81g",
 	}, nil
 }
 
 // Auth returns the configuration for the general auth package.
 func (cfg *Configs) Auth() (*auth.Config, error) {
 	return &auth.Config{
-		JWTSigningKey: `MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjcmJdMx2/rKFtBz955uNjvoboDBhxswSRlVfGFwf2wUBInFpUeT7KN/Q/
-			P8WtNOabGLNvvyUi79R1tucdR4jaSqm/G51xNesDa52ukh2FgQ/4YziAt1A9AOHaCTufE3d4jl2JRHCBQDMuKIRdJu9Va01MQZ3oplrrVbeRlEWF0UZY5
-			woNzLvuUNIl+mfuL6w5SnoS1S41EIVcbJ+i558mnsRkrlh9OLnEni/GLxXdHYJHEaA37HGpMSnlP+ruAIIRCQcqL/6ikcOe5y4EAEBy7uo+JTb8P0onSa
-			S4wokkrB0BlJEeOA+TzgnwtHRy854Uo+rcIbuQd6V9yHas9I4eQIDAQAB`,
+		JWTSigningKey: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjcmJdMx2/rKFtBz955uNjvoboDBhxswSRlVfGFwf2wUBInFpUeT7KN/Q/P8WtNOabGLNvvyUi79R1tucdR4jaSqm/G51xNesDa52ukh2FgQ/4YziAt1A9AOHaCTufE3d4jl2JRHCBQDMuKIRdJu9Va01MQZ3oplrrVbeRlEWF0UZY5woNzLvuUNIl+mfuL6w5SnoS1S41EIVcbJ+i558mnsRkrlh9OLnEni/GLxXdHYJHEaA37HGpMSnlP+ruAIIRCQcqL/6ikcOe5y4EAEBy7uo+JTb8P0onSaS4wokkrB0BlJEeOA+TzgnwtHRy854Uo+rcIbuQd6V9yHas9I4eQIDAQAB",
+		Kid:           "QUOiE1p0V7YUUqxotLr3k_i8REyAHzAy5SMlSvFE81g",
 	}, nil
 }
 

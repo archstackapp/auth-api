@@ -8,12 +8,16 @@ require (
 	github.com/Nerzal/gocloak v1.0.0
 	github.com/Nerzal/gocloak/v7 v7.4.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/go-oauth2/oauth2 v3.9.2+incompatible
 	github.com/go-oauth2/oauth2/v4 v4.1.2
+	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/go-session/session v3.1.2+incompatible
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.1.16
+	github.com/pkg/errors v0.9.1
 	gitlab.com/archstack/workspace-api v0.0.0-00010101000000-000000000000
 	go.uber.org/zap v1.15.0
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a

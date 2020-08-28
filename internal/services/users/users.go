@@ -29,14 +29,23 @@ func NewService(logger *logger.Logger, datastore *datastore.Datastore, auth auth
 func (u *Users) CreateUser(authUser *auth.User, user *models.User) (*auth.User, *models.User, error) {
 	authUser, err := u.auth.CreateUser(authUser)
 	if err != nil {
+		u.logger.Zap.Debugw("Failed to create auth user",
+			"authUser", authUser,
+			"user", user,
+			"err", err)
 		return nil, nil, err
 	}
 
+	user.AuthID = authUser.ID
 	user, err = u.Repository.create(user)
 	if err != nil {
+		u.logger.Zap.Debugw("Failed to create user in repository",
+			"authUser", authUser,
+			"user", user,
+			"err", err)
 		err2 := u.auth.DeleteUser(authUser)
 		if err2 != nil {
-			u.logger.Errorw("Unable to delete orphaned auth user",
+			u.logger.Zap.Errorw("Unable to delete orphaned auth user",
 				"err", err2.Error(),
 				"authUserId", authUser.ID,
 				"authUserMail", authUser.Mail)
@@ -46,6 +55,11 @@ func (u *Users) CreateUser(authUser *auth.User, user *models.User) (*auth.User, 
 	}
 
 	return authUser, user, nil
+}
+
+// Login logs a user into keycloak and returns the access token.
+func (u *Users) Login(mail string, password string) (string, error) {
+	return u.auth.Login(mail, password)
 }
 
 // GetAuthUserByMail retrieves an auth user by its mail.
