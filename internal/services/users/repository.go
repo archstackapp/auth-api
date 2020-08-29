@@ -43,11 +43,11 @@ func (r *UserRepository) GetByID(id uuid.UUID) (*models.User, error) {
 	return user, err
 }
 
-func (r *UserRepository) GetByMail(mail string) (*models.User, error) {
+func (r *UserRepository) GetByAuthID(authID uuid.UUID) (*models.User, error) {
 	user := new(models.User)
 
 	err := r.datastore.DB.Model(user).
-		Where("mail = ?", mail).
+		Where("auth_id = ?", authID).
 		Select()
 
 	return user, err

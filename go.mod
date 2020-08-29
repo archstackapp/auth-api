@@ -7,6 +7,7 @@ replace gitlab.com/archstack/workspace-api => ../workspace-api
 require (
 	github.com/Nerzal/gocloak v1.0.0
 	github.com/Nerzal/gocloak/v7 v7.4.0
+	github.com/dghubble/sling v1.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/go-oauth2/oauth2 v3.9.2+incompatible

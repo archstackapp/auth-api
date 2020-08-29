@@ -72,9 +72,9 @@ func (u *Users) GetAuthUserByID(id uuid.UUID) (*auth.User, error) {
 	return u.auth.GetUserByID(id)
 }
 
-// GetDataUserByMail retrieves a data user by its mail.
-func (u *Users) GetDataUserByMail(mail string) (*models.User, error) {
-	return u.Repository.GetByMail(mail)
+// GetDataUserByAuthID retrieves a data user by its authID.
+func (u *Users) GetDataUserByAuthID(authID uuid.UUID) (*models.User, error) {
+	return u.Repository.GetByAuthID(authID)
 }
 
 // GetDataUserByID retrieves a data user by its id.
