@@ -1,8 +1,8 @@
 package main
 
 import (
+	"gitlab.com/archstack/auth-api/internal/api"
 	"gitlab.com/archstack/auth-api/internal/configs"
-	"gitlab.com/archstack/auth-api/internal/server/http/handlers"
 	"gitlab.com/archstack/auth-api/internal/services/auth/keycloak"
 	"gitlab.com/archstack/auth-api/internal/services/users"
 	"gitlab.com/archstack/workspace-api/lib/datastore"
@@ -41,9 +41,15 @@ func main() {
 	}
 
 	server, err := http.NewEchoService(logger, httpConfig)
+	if err != nil {
+		panic(err)
+	}
 
-	handlers, err := handlers.NewService(logger, keycloak, users)
-	handlers.AddHandlers(server)
+	api, err := api.NewService(logger, keycloak, users)
+	if err != nil {
+		panic(err)
+	}
+	api.AddHandlers(server)
 
 	logger.Zap.Info("Loaded all services")
 	logger.Zap.Infow("HTTP server starting", zap.String("port", httpConfig.Port))

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rsa"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -24,6 +25,7 @@ type Keycloak struct {
 	logger           *logger.Logger
 	Certs            interface{}
 	publicKey        *rsa.PublicKey
+	tokenMutex       *sync.Mutex
 }
 
 // Config struct holds all the configurations for accessing a keycloak instance.
@@ -72,6 +74,7 @@ func NewService(logger *logger.Logger, datastore *datastore.Datastore, config *C
 		token:            initialToken,
 		tokenLastUpdated: time.Now(),
 		publicKey:        rsaPublicKey,
+		tokenMutex:       &sync.Mutex{},
 	}
 
 	return w, nil
@@ -89,7 +92,10 @@ func getToken(ctx context.Context, config *Config, client gocloak.GoCloak) (*goc
 
 func (k *Keycloak) getToken(ctx context.Context) (*gocloak.JWT, error) {
 	now := time.Now()
-	if now.After(k.tokenLastUpdated.Add(time.Hour * time.Duration(3))) {
+
+	k.tokenMutex.Lock()
+
+	if now.After(k.tokenLastUpdated.Add(time.Second * time.Duration(52))) {
 		newToken, err := getToken(ctx, k.config, k.client)
 		if err != nil {
 			return nil, err
@@ -98,8 +104,11 @@ func (k *Keycloak) getToken(ctx context.Context) (*gocloak.JWT, error) {
 		k.token = newToken
 		k.tokenLastUpdated = now
 	}
+	newToken := *k.token
 
-	return k.token, nil
+	k.tokenMutex.Unlock()
+
+	return &newToken, nil
 }
 
 // CreateUser creates a new user on the keycloak instance.
