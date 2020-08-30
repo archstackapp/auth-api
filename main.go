@@ -5,9 +5,9 @@ import (
 	"gitlab.com/archstack/auth-api/internal/configs"
 	"gitlab.com/archstack/auth-api/internal/services/auth/keycloak"
 	"gitlab.com/archstack/auth-api/internal/services/users"
-	"gitlab.com/archstack/workspace-api/lib/datastore"
-	"gitlab.com/archstack/workspace-api/lib/logger"
-	"gitlab.com/archstack/workspace-api/lib/server/http"
+	"gitlab.com/archstack/core-api/lib/datastore"
+	"gitlab.com/archstack/core-api/lib/logger"
+	"gitlab.com/archstack/core-api/lib/server/http"
 	"go.uber.org/zap"
 )
 

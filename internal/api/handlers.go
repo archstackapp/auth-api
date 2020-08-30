@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/go-playground/validator"
@@ -10,11 +11,11 @@ import (
 	"gitlab.com/archstack/auth-api/internal/services/auth"
 	"gitlab.com/archstack/auth-api/internal/services/users"
 	authmodels "gitlab.com/archstack/auth-api/lib/models"
-	"gitlab.com/archstack/auth-api/lib/server/http/middleware"
 	"gitlab.com/archstack/auth-api/lib/utils"
-	"gitlab.com/archstack/workspace-api/lib/logger"
-	"gitlab.com/archstack/workspace-api/lib/models"
-	archhttp "gitlab.com/archstack/workspace-api/lib/server/http"
+	"gitlab.com/archstack/core-api/lib/logger"
+	"gitlab.com/archstack/core-api/lib/models"
+	archhttp "gitlab.com/archstack/core-api/lib/server/http"
+	"gitlab.com/archstack/core-api/lib/server/http/middleware"
 )
 
 var validate *validator.Validate
@@ -41,15 +42,23 @@ func (api *API) AddHandlers(s *archhttp.EchoServer) {
 	//signingKeys := make(map[string]interface{})
 	signingKey := api.authPublicKey
 
+	cookieMiddleware := middleware.UserCookieAuth()
 	authMiddleware := middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey:    signingKey,
 		SigningMethod: jwt.SigningMethodRS256.Name,
+		ErrorHandlerWithContext: func(err error, c echo.Context) error {
+			return c.JSON(http.StatusUnauthorized, echo.Map{"message": "token is invalid"})
+		},
 	})
+
+	authGroup := s.Echo.Group("/auth")
+	authGroup.Use(cookieMiddleware)
+	authGroup.Use(authMiddleware)
 
 	s.Echo.GET("/publickey", api.getAuthPublicKey)
 	s.Echo.POST("/login", api.login)
 	s.Echo.POST("/register", api.register)
-	s.Echo.GET("/auth", api.checkAuth, authMiddleware)
+	authGroup.GET("", api.checkAuth)
 }
 
 // LoginRequestBody is the JSON body of a request to the login handler.
@@ -74,6 +83,13 @@ func (api *API) login(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
+	cookie := new(http.Cookie)
+	cookie.Name = "token"
+	cookie.Value = token
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+
+	c.SetCookie(cookie)
 
 	return c.JSON(http.StatusOK, echo.Map{"token": token})
 }

@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"gitlab.com/archstack/auth-api/internal/services/auth/keycloak"
-	"gitlab.com/archstack/workspace-api/lib/datastore"
-	"gitlab.com/archstack/workspace-api/lib/server/http"
+	"gitlab.com/archstack/core-api/lib/datastore"
+	"gitlab.com/archstack/core-api/lib/server/http"
 )
 
 // TestConfigs struct handles all dependencies required for handling configurations

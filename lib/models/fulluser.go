@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/gofrs/uuid"
-	"gitlab.com/archstack/workspace-api/lib/models"
+	"gitlab.com/archstack/core-api/lib/models"
 )
 
 // FullUser represents an authenticated user of the apps.
