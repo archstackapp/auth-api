@@ -16,7 +16,8 @@ type Configs struct {
 // HTTP returns the configuration required for HTTP package
 func (cfg *Configs) HTTP() (*http.Config, error) {
 	return &http.Config{
-		Port: "3333",
+		Port:         "3333",
+		AllowOrigins: []string{"http://localhost:3000"},
 	}, nil
 }
 

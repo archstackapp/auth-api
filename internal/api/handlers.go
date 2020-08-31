@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator"
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"gitlab.com/archstack/auth-api/internal/services/auth"
 	"gitlab.com/archstack/auth-api/internal/services/users"
 	authmodels "gitlab.com/archstack/auth-api/lib/models"
@@ -38,8 +39,12 @@ func NewService(logger *logger.Logger, auth auth.Auth, users *users.Users) (*API
 
 // AddHandlers adds the echo handlers that are part of this package.
 func (api *API) AddHandlers(s *archhttp.EchoServer) {
-	//api.verifyToken()
-	//signingKeys := make(map[string]interface{})
+	s.Echo.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
+		AllowOrigins:     s.Config.AllowOrigins,
+		AllowCredentials: true,
+		AllowMethods:     []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+	}))
+
 	signingKey := api.authPublicKey
 
 	cookieMiddleware := middleware.UserCookieAuth()
@@ -88,6 +93,9 @@ func (api *API) login(c echo.Context) error {
 	cookie.Name = "token"
 	cookie.Value = token
 	cookie.Expires = time.Now().Add(24 * time.Hour)
+	// TODO
+	cookie.SameSite = http.SameSiteLaxMode
+	cookie.HttpOnly = true
 
 	c.SetCookie(cookie)
 
@@ -155,5 +163,10 @@ func (api *API) checkAuth(c echo.Context) error {
 
 	fullUser := utils.MergeUser(authUser, dataUser)
 
-	return c.JSON(http.StatusOK, echo.Map{"userId": dataUser.ID, "authUserId": id, "user": fullUser})
+	return c.JSON(http.StatusOK, echo.Map{
+		"token":      token.Raw,
+		"userId":     dataUser.ID,
+		"authUserId": id,
+		"user":       fullUser,
+	})
 }
