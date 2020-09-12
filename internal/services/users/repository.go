@@ -37,6 +37,7 @@ func (r *UserRepository) GetByID(id uuid.UUID) (*models.User, error) {
 	user := new(models.User)
 
 	err := r.datastore.DB.Model(user).
+		Relation("Workspaces").
 		Where("id = ?", id).
 		Select()
 
@@ -47,6 +48,7 @@ func (r *UserRepository) GetByAuthID(authID uuid.UUID) (*models.User, error) {
 	user := new(models.User)
 
 	err := r.datastore.DB.Model(user).
+		Relation("Workspaces").
 		Where("auth_id = ?", authID).
 		Select()
 

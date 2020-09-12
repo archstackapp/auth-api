@@ -145,15 +145,19 @@ func (api *API) checkAuth(c echo.Context) error {
 
 	claims := token.Claims.(jwt.MapClaims)
 	idString := claims["sub"]
+	firstName := claims["given_name"].(string)
+	lastName := claims["family_name"].(string)
+	mail := claims["email"].(string)
 
 	id, err := uuid.FromString(idString.(string))
 	if err != nil {
 		return err
 	}
 
-	authUser, err := api.users.GetAuthUserByID(id)
-	if err != nil {
-		return err
+	authUser := &auth.User{
+		FirstName: firstName,
+		LastName:  lastName,
+		Mail:      mail,
 	}
 
 	dataUser, err := api.users.GetDataUserByAuthID(id)
