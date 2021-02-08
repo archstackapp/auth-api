@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/joho/godotenv"
 	"gitlab.com/archstack/auth-api/internal/api"
 	"gitlab.com/archstack/auth-api/internal/configs"
 	"gitlab.com/archstack/auth-api/internal/services/auth/keycloak"
@@ -12,6 +13,8 @@ import (
 )
 
 func main() {
+	err := godotenv.Load(".env")
+
 	configs, err := configs.NewService()
 	if err != nil {
 		panic(err)
