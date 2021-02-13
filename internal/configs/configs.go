@@ -45,7 +45,7 @@ func (cfg *Configs) Keycloak() (*keycloak.Config, error) {
 func (cfg *Configs) Auth() (*auth.Config, error) {
 	return &auth.Config{
 		JWTSigningKey: os.Getenv("AUTH_JWT_SIGNING_KEY"),
-		Kid:           os.Getenv("AUTH_KEYCLOAK_KID"),
+		Kid:           os.Getenv("KEYCLOAK_KID"),
 	}, nil
 }
 
