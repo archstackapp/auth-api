@@ -6,9 +6,15 @@ ENV APP_HOME /go/src/app
 RUN groupadd $APP_USER && useradd -m -g $APP_USER -l $APP_USER
 RUN mkdir -p $APP_HOME && chown -R $APP_USER:$APP_USER $APP_HOME
 
-WORKDIR $APP_HOME
 USER $APP_USER
-COPY . .
+WORKDIR $APP_HOME
+
+RUN mkdir ../core-api
+
+COPY ./auth-api .
+COPY ./core-api ../core-api
+
+WORKDIR $APP_HOME
 
 RUN go mod download
 RUN go mod verify

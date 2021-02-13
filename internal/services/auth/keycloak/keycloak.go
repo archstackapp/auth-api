@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rsa"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -45,7 +46,13 @@ type Config struct {
 
 // NewService creates a new Keycloak service.
 func NewService(logger *logger.Logger, datastore *datastore.Datastore, config *Config) (*Keycloak, error) {
-	client := gocloak.NewClient(config.Host + ":" + config.Port)
+	keycloakURL := config.Host
+
+	if config.Port != "" {
+		keycloakURL = fmt.Sprintf("%s:%s", config.Host, config.Port)
+	}
+
+	client := gocloak.NewClient(keycloakURL)
 
 	ctx := context.Background()
 	initialToken, err := getToken(ctx, config, client)
