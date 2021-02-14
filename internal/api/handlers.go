@@ -53,6 +53,8 @@ func (api *API) AddHandlers(s *archhttp.EchoServer) {
 		SigningKey:    signingKey,
 		SigningMethod: jwt.SigningMethodRS256.Name,
 		ErrorHandlerWithContext: func(err error, c echo.Context) error {
+			api.logger.Debugw("Unable to verify token", "err", err.Error())
+
 			return c.JSON(http.StatusUnauthorized, echo.Map{"message": "token is invalid"})
 		},
 	})
