@@ -44,8 +44,9 @@ func (cfg *Configs) Keycloak() (*keycloak.Config, error) {
 // Auth returns the configuration for the general auth package.
 func (cfg *Configs) Auth() (*auth.Config, error) {
 	return &auth.Config{
-		JWTSigningKey: os.Getenv("AUTH_JWT_SIGNING_KEY"),
-		Kid:           os.Getenv("KEYCLOAK_KID"),
+		JWTSigningKey:    os.Getenv("AUTH_JWT_SIGNING_KEY"),
+		Kid:              os.Getenv("KEYCLOAK_KID"),
+		AuthCookieDomain: os.Getenv("AUTH_COOKIE_DOMAIN"),
 	}, nil
 }
 

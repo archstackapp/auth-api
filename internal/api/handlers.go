@@ -23,18 +23,19 @@ var validate *validator.Validate
 
 type API struct {
 	auth          auth.Auth
+	authConfig    *auth.Config
 	users         *users.Users
 	logger        *logger.Logger
 	validate      *validator.Validate
 	authPublicKey interface{}
 }
 
-func NewService(logger *logger.Logger, auth auth.Auth, users *users.Users) (*API, error) {
+func NewService(logger *logger.Logger, auth auth.Auth, authConfig *auth.Config, users *users.Users) (*API, error) {
 	validate := validator.New()
 
 	publicKey := auth.PublicKey()
 
-	return &API{auth, users, logger, validate, publicKey}, nil
+	return &API{auth, authConfig, users, logger, validate, publicKey}, nil
 }
 
 // AddHandlers adds the echo handlers that are part of this package.

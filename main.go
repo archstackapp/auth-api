@@ -24,7 +24,7 @@ func main() {
 
 	keycloakConfig, err := configs.Keycloak()
 	pgConfig, err := configs.Datastore()
-	_, err = configs.Auth()
+	authConfig, err := configs.Auth()
 	httpConfig, err := configs.HTTP()
 
 	datastore, err := datastore.NewService(pgConfig)
@@ -48,7 +48,7 @@ func main() {
 		panic(err)
 	}
 
-	api, err := api.NewService(logger, keycloak, users)
+	api, err := api.NewService(logger, keycloak, authConfig, users)
 	if err != nil {
 		panic(err)
 	}
