@@ -1,6 +1,7 @@
 package users
 
 import (
+	"github.com/go-pg/pg/v10/orm"
 	uuid "github.com/gofrs/uuid"
 	"gitlab.com/archstack/core-api/lib/datastore"
 	"gitlab.com/archstack/core-api/lib/models"
@@ -9,6 +10,10 @@ import (
 // UserRepository enables CRUD ops on the db for the User objects.
 type UserRepository struct {
 	datastore *datastore.Datastore
+}
+
+func init() {
+	orm.RegisterTable((*models.WorkspaceAndUser)(nil))
 }
 
 func (r *UserRepository) create(user *models.User) (*models.User, error) {

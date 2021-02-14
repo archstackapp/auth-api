@@ -61,7 +61,7 @@ func (cfg *Configs) Datastore() (*datastore.Config, error) {
 		Username:  os.Getenv("DB_USER"),
 		Password:  os.Getenv("DB_PASSWORD"),
 
-		SSLMode: "",
+		SSLMode: os.Getenv("DB_SSL_MODE"),
 
 		ConnPoolSize: 10,
 		ReadTimeout:  time.Second * 5,

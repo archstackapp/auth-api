@@ -16,7 +16,7 @@ type FullUser struct {
 
 	Level int `json:"level"`
 
-	Workspaces []*models.Workspace `json:"workspaces"`
+	Workspaces []models.Workspace `json:"workspaces"`
 
 	InvitedBy *models.User `json:"invitedBy"`
 }
