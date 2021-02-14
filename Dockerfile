@@ -19,7 +19,7 @@ WORKDIR $APP_HOME
 
 RUN go mod download
 RUN go mod verify
-RUN go build -o app -mod=readonly
+RUN go build -o app
 
 FROM debian:buster
 
