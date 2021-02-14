@@ -97,8 +97,8 @@ func (api *API) login(c echo.Context) error {
 	cookie.Value = token
 	cookie.Domain = api.authConfig.AuthCookieDomain
 	cookie.Expires = time.Now().Add(24 * time.Hour)
-	//cookie.Secure = true
-	cookie.SameSite = http.SameSiteStrictMode
+	cookie.Secure = true
+	cookie.SameSite = http.SameSiteNoneMode
 	cookie.HttpOnly = true
 
 	c.SetCookie(cookie)
