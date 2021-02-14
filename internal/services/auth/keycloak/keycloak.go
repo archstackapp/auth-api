@@ -64,10 +64,13 @@ func NewService(logger *logger.Logger, datastore *datastore.Datastore, config *C
 	if err != nil {
 		panic(err)
 	}
-	if certResult.Keys == nil {
+	if certResult.Keys == nil || len(*certResult.Keys) == 0 {
 		panic("there is no keys to decode the token")
 	}
 	key := findUsedKey(config.Kid, *certResult.Keys)
+	if key == nil {
+		panic("keycloak publicKey may not be nil")
+	}
 	rsaPublicKey, err := decodePublicKey(key.E, key.N)
 	if err != nil {
 		panic(err)

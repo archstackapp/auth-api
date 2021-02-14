@@ -48,12 +48,12 @@ func (api *API) AddHandlers(s *archhttp.EchoServer) {
 
 	signingKey := api.authPublicKey
 
-	cookieMiddleware := middleware.UserCookieAuth()
+	cookieMiddleware := middleware.UserCookieAuth(api.logger)
 	authMiddleware := middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey:    signingKey,
 		SigningMethod: jwt.SigningMethodRS256.Name,
 		ErrorHandlerWithContext: func(err error, c echo.Context) error {
-			api.logger.Debugw("Unable to verify token", "errMessage", err.Error())
+			api.logger.Zap.Debugw("Unable to verify token", "errMessage", err.Error())
 
 			return c.JSON(http.StatusUnauthorized, echo.Map{"message": "token is invalid"})
 		},
@@ -97,7 +97,7 @@ func (api *API) login(c echo.Context) error {
 	cookie.Value = token
 	cookie.Domain = api.authConfig.AuthCookieDomain
 	cookie.Expires = time.Now().Add(24 * time.Hour)
-	cookie.Secure = true
+	//cookie.Secure = true
 	cookie.SameSite = http.SameSiteLaxMode
 	cookie.HttpOnly = true
 
