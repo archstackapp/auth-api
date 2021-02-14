@@ -7,7 +7,6 @@ ENV CORE_HOME /go/src/core-api
 RUN groupadd $APP_USER && useradd -m -g $APP_USER -l $APP_USER
 RUN mkdir -p $APP_HOME
 RUN mkdir -p $CORE_HOME
-RUN mkdir -p $WORKSPACE_HOME
 
 COPY ./auth-api $APP_HOME
 COPY ./core-api $CORE_HOME
