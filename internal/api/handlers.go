@@ -93,6 +93,7 @@ func (api *API) login(c echo.Context) error {
 	cookie := new(http.Cookie)
 	cookie.Name = "token"
 	cookie.Value = token
+	cookie.Domain = api.authConfig.AuthCookieDomain
 	cookie.Expires = time.Now().Add(24 * time.Hour)
 	cookie.Secure = true
 	cookie.SameSite = http.SameSiteLaxMode
